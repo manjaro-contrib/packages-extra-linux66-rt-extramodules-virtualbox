@@ -4,41 +4,38 @@
 # Sébastien Luttringer <seblu@aur.archlinux.org>
 
 _linuxprefix=linux66-rt
-_extramodules=extramodules-6.6-rt-MANJARO
-_pkgname=virtualbox-host-modules
-pkgname=$_linuxprefix-$_pkgname
+
+pkgname=("${_linuxprefix}-virtualbox-host-modules")
 pkgver=7.1.4
 _pkgver="${pkgver}_OSE"
 pkgrel=4
+pkgdesc='Virtualbox host kernel modules for Manjaro Kernel'
 arch=('x86_64')
 url='http://virtualbox.org'
 license=('GPL')
-pkgdesc='Host kernel modules for VirtualBox'
-groups=("$_linuxprefix-extramodules")
-install=virtualbox-host-modules.install
-depends=("$_linuxprefix")
-makedepends=("virtualbox-host-dkms>=$pkgver" 'dkms' "$_linuxprefix" "$_linuxprefix-headers")
+groups=("${_linuxprefix}-extramodules")
+depends=("${_linuxprefix}")
+makedepends=("${_linuxprefix}-headers" "virtualbox-host-dkms=$pkgver")
 provides=('VIRTUALBOX-HOST-MODULES')
-replaces=("linux515-rt-$_pkgname" "linux60-rt-$_pkgname")
+conflicts=("${_linuxprefix}-virtualbox-modules" 'virtualbox-host-dkms')
+replaces=("${_linuxprefix}-virtualbox-modules")
 
 build() {
-  _kernver="$(cat /usr/lib/modules/$_extramodules/version)"
+  _kernver="$(cat /usr/src/${_linuxprefix}/version)"
 
-  # build host modules
-  echo 'Host modules'
   fakeroot dkms build --dkmstree "$srcdir" -m vboxhost/${pkgver}_OSE -k ${_kernver}
 }
 
-package(){
-  _kernver="$(cat /usr/lib/modules/$_extramodules/version)"
+package() {
+  _kernver="$(cat /usr/src/${_linuxprefix}/version)"
 
-  cd "vboxhost/${pkgver}_OSE/$_kernver/$CARCH/module"
-  install -Dm644 * -t "$pkgdir/usr/lib/modules/$_extramodules/"
+  cd "vboxhost/${pkgver}_OSE/${_kernver}/$CARCH/module"
+  install -Dm 644 * -t "$pkgdir/usr/lib/modules/${_kernver}/extramodules/"
 
   # compress each module individually
   find "$pkgdir" -name '*.ko' -exec xz -T1 {} +
 
   # systemd module loading
   printf '%s\n' vboxdrv vboxnetadp vboxnetflt |
-  install -Dm644 /dev/stdin "$pkgdir/usr/lib/modules-load.d/$pkgname.conf"
+  install -Dm 644 /dev/stdin "$pkgdir/usr/lib/modules-load.d/$pkgname.conf"
 }
