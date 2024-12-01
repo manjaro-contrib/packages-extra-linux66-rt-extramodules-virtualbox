@@ -1,14 +1,14 @@
 # Maintainer: Bernhard Landauer <bernhard@manjaro.org>
-# Archlinux credits:
-# Ionut Biru <ibiru@archlinux.org>
-# Sébastien Luttringer <seblu@aur.archlinux.org>
+# Contributor: Christian Hesse <eworm@archlinux.org>
+# Contributor: Sébastien "Seblu" Luttringer
+# Contributor: Ionut Biru <ibiru@archlinux.org>
 
 _linuxprefix=linux66-rt
 
 pkgname=("${_linuxprefix}-virtualbox-host-modules")
 pkgver=7.1.4
 _pkgver="${pkgver}_OSE"
-pkgrel=4
+pkgrel=5
 pkgdesc='Virtualbox host kernel modules for Manjaro Kernel'
 arch=('x86_64')
 url='http://virtualbox.org'
@@ -33,7 +33,7 @@ package() {
   install -Dm 644 * -t "$pkgdir/usr/lib/modules/${_kernver}/extramodules/"
 
   # compress each module individually
-  find "$pkgdir" -name '*.ko' -exec xz -T1 {} +
+  find "${pkgdir}" -name '*.ko' -exec zstd --rm -19 {} +
 
   # systemd module loading
   printf '%s\n' vboxdrv vboxnetadp vboxnetflt |
