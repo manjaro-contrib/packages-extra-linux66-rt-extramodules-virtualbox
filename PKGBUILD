@@ -6,9 +6,9 @@
 _linuxprefix=linux66-rt
 
 pkgname=("${_linuxprefix}-virtualbox-host-modules")
-pkgver=7.1.4
+pkgver=7.1.6
 _pkgver="${pkgver}_OSE"
-pkgrel=6
+pkgrel=1
 pkgdesc='Virtualbox host kernel modules for Manjaro Kernel'
 arch=('x86_64')
 url='http://virtualbox.org'
